@@ -1,0 +1,21 @@
+@startuml
+component "Health Monitor" as Health <<ARC-HealthMonitor>>
+component "Watchdog Manager" as Watchdog <<ARC-WatchdogManager>>
+component "Diagnostic Manager" as Diagnostics <<ARC-DiagnosticManager>>
+component "Priority Scheduler" as Scheduler <<ARC-Scheduler>>
+component "Memory Protection Service" as MPU <<ARC-MemoryProtection>>
+component "Platform Abstraction" as Platform <<ARC-Platform>>
+interface CheckpointAPI as ICheckpoint
+interface FaultReporter as IFault
+interface ResetControl as IReset
+Scheduler --> IFault : deadline miss
+MPU --> IFault : access violation
+ICheckpoint --> Health : task checkpoint
+IFault --> Health : fault event
+Health --> Diagnostics : persist fault
+Health --> Watchdog : health summary
+Watchdog --> IReset : request reset
+IReset --> Platform : reset ECU
+Diagnostics --> Platform : nonvolatile write
+note right of Health: SAF-001 SAF-002
+@enduml

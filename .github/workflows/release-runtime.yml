@@ -1,0 +1,70 @@
+name: Release PlantToXMI Runtime
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows-runtime:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Sync dependencies
+        run: uv sync --extra dev
+
+      - name: Run tests
+        run: uv run pytest
+
+      - name: Build executable
+        run: uv run pyinstaller --onefile -n planttoxmi src/planttoxmi/__main__.py
+
+      - name: Package runtime
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}".TrimStart("v")
+          $package = "planttoxmi-win-x64-v$version"
+          New-Item -ItemType Directory -Force "dist/$package"
+          Copy-Item "dist/planttoxmi.exe" "dist/$package/"
+          Compress-Archive -Path "dist/$package/*" -DestinationPath "dist/$package.zip"
+          Get-FileHash "dist/$package.zip" -Algorithm SHA256 |
+            ForEach-Object { $_.Hash } |
+            Set-Content "dist/$package.sha256"
+
+      - name: Create manifest
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}".TrimStart("v")
+          $package = "planttoxmi-win-x64-v$version.zip"
+          $sha = Get-Content "dist/planttoxmi-win-x64-v$version.sha256"
+
+          @"
+          {
+            "schemaVersion": 1,
+            "product": "planttoxmi",
+            "version": "$version",
+            "channel": "stable",
+            "platform": "win-x64",
+            "minimumBootstrapperVersion": "1.0.0",
+            "assetName": "$package",
+            "sha256": "$sha",
+            "entryPoint": "planttoxmi.exe"
+          }
+          "@ | Set-Content "dist/manifest.json"
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/planttoxmi-win-x64-v*.zip
+            dist/planttoxmi-win-x64-v*.sha256
+            dist/manifest.json

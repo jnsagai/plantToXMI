@@ -1,0 +1,17 @@
+@startuml
+participant "Timer Driver" as Timer
+participant "Priority Scheduler" as Scheduler
+participant "Memory Protection Service" as MPU
+participant "Kernel Core" as Kernel
+participant "Safety Task" as Task
+participant "Health Monitor" as Health
+Timer -> Scheduler : tick interrupt
+Scheduler -> Scheduler : update budgets
+Scheduler -> Health : report deadline miss
+Health --> Scheduler : fault action
+Scheduler -> MPU : switch task region
+MPU --> Scheduler : region active
+Scheduler -> Kernel : dispatch next task
+Kernel -> Task : run activation
+Task --> Health : checkpoint
+@enduml

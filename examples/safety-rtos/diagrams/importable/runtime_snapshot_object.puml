@@ -1,0 +1,24 @@
+@startuml
+object "TaskA:TaskControlBlock" as TaskA {
+  taskId = 7
+  priority = 2
+  state = Ready
+  deadlineTicks = 10
+}
+object "TaskB:TaskControlBlock" as TaskB {
+  taskId = 8
+  priority = 3
+  state = Waiting
+  deadlineTicks = 20
+}
+object "ReadyQueue:PriorityQueue" as ReadyQueue {
+  depth = 1
+  head = TaskA
+}
+object "SafetyMode:SystemMode" as SafetyMode {
+  mode = Normal
+}
+ReadyQueue --> TaskA : contains
+TaskA --> SafetyMode : executes under
+TaskB --> SafetyMode : blocked under
+@enduml

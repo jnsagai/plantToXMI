@@ -1,0 +1,9 @@
+@startuml
+node "Safety ECU" as ECU
+node "Microcontroller" as MCU
+artifact "SafetyLite RTOS" as RTOS
+artifact "Safety Application" as APP
+ECU --> MCU
+MCU --> RTOS
+RTOS --> APP
+@enduml

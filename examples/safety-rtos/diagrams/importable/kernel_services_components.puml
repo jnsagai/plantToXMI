@@ -1,0 +1,42 @@
+@startuml
+title SafetyLite kernel services component view
+
+component "Kernel Core" as Kernel <<ARC-Kernel>>
+component "Priority Scheduler" as Scheduler <<ARC-Scheduler>>
+component "Task Supervisor" as TaskSupervisor <<ARC-TaskSupervisor>>
+component "Time Service" as TimeService <<ARC-TimeService>>
+component "IPC Manager" as IPC <<ARC-IPC>>
+component "Memory Protection Service" as MPU <<ARC-MemoryProtection>>
+component "Configuration Manager" as Config <<ARC-ConfigManager>>
+component "Mode Manager" as ModeManager <<ARC-ModeManager>>
+component "Safety Application API" as AppAPI <<ARC-AppAPI>>
+
+interface TaskControl as ITaskControl
+interface TickSource as ITick
+interface QueueService as IQueue
+interface EventFlagService as IEvent
+interface RegionSwitch as IRegion
+interface ModeControl as IMode
+interface ConfigurationAccess as IConfig
+
+AppAPI --> ITaskControl : activate task
+ITaskControl --> Kernel : validate caller
+Kernel --> Scheduler : choose next task
+Scheduler --> TaskSupervisor : update budget
+Scheduler --> TimeService : read tick
+Scheduler --> IPC : unblock waiters
+Scheduler --> MPU : install memory map
+Scheduler --> ModeManager : check service mode
+IPC --> IQueue : bounded queue
+IPC --> IEvent : event flags
+MPU --> IRegion : region switch
+Config --> IConfig : task and region table
+Kernel --> Config : load configuration
+Kernel --> ModeManager : normal/degraded/safe
+ModeManager --> IMode : mode state
+TimeService --> ITick : monotonic tick
+
+note right of Scheduler: REQ-001 KER-002 KER-003 SAF-005
+note right of IPC: REQ-003 KER-005 KER-006
+note right of MPU: REQ-002 SAF-003 PLT-003
+@enduml

@@ -1,0 +1,14 @@
+@startuml
+profile "SafetyLite Profile" {
+  stereotype "SafetyCritical" as SafetyCritical
+  stereotype "ASIL_D" as ASILD
+  stereotype "BoundedExecution" as BoundedExecution
+  stereotype "HardwareAbstraction" as HardwareAbstraction
+  metaclass "Component" as UMLComponent
+  metaclass "Operation" as UMLOperation
+}
+SafetyCritical --|> UMLComponent
+ASILD --|> SafetyCritical
+BoundedExecution --|> UMLOperation
+HardwareAbstraction --|> UMLComponent
+@enduml

@@ -1,0 +1,20 @@
+@startuml
+robust "Scheduler" as Scheduler
+robust "Safety Task" as Task
+robust "Watchdog Window" as Watchdog
+@0
+Scheduler is Idle
+Task is Waiting
+Watchdog is Open
+@5
+Scheduler is TickProcessing
+@7
+Task is Ready
+@10
+Scheduler is Dispatching
+Task is Running
+@14
+Task is CheckpointReported
+@18
+Watchdog is Closed
+@enduml

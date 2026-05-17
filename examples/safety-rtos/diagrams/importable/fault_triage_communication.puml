@@ -1,0 +1,12 @@
+@startuml
+object "Scheduler" as Scheduler
+object "Health Monitor" as Health
+object "Diagnostic Manager" as Diagnostics
+object "Watchdog Manager" as Watchdog
+object "Kernel Core" as Kernel
+Scheduler --> Health : 1. reportDeadlineMiss(taskId)
+Health --> Diagnostics : 1.1 storeFaultRecord(fault)
+Health --> Kernel : 1.2 requestSafeState(taskId)
+Kernel --> Watchdog : 1.3 inhibitRefresh()
+Diagnostics --> Watchdog : 1.4 exposeResetReason()
+@enduml

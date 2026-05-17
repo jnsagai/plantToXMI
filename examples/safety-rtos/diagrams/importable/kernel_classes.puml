@@ -1,0 +1,17 @@
+@startuml
+class TaskControlBlock {
+  +taskId
+  +priority
+  +deadlineTicks
+}
+class Scheduler {
+  +activateTask()
+  +selectNext()
+}
+class HealthMonitor {
+  +reportCheckpoint()
+  +raiseFault()
+}
+Scheduler --> TaskControlBlock
+Scheduler --> HealthMonitor
+@enduml

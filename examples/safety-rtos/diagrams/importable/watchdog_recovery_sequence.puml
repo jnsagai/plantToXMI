@@ -1,0 +1,17 @@
+@startuml
+participant "Safety Task" as Task
+participant "Health Monitor" as Health
+participant "Watchdog Manager" as Watchdog
+participant "Diagnostic Manager" as Diagnostics
+participant "Platform Abstraction" as Platform
+Task -> Health : submit checkpoint
+Watchdog -> Health : request health summary
+Health --> Watchdog : checkpoints complete
+Watchdog -> Platform : refresh external watchdog
+Platform --> Watchdog : refresh accepted
+Task -> Health : missing checkpoint
+Watchdog -> Health : request health summary
+Health --> Watchdog : checkpoint missing
+Watchdog -> Diagnostics : store watchdog fault
+Watchdog -> Platform : withhold refresh
+@enduml

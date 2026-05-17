@@ -1,0 +1,10 @@
+@startuml
+[*] --> Dormant
+Dormant --> Ready : activate
+Ready --> Running : dispatch
+Running --> Ready : preempt
+Running --> Waiting : wait event
+Waiting --> Ready : event set
+Running --> Faulted : deadline miss
+Faulted --> [*]
+@enduml

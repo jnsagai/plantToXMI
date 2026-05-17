@@ -1,0 +1,18 @@
+@startuml
+participant "Kernel Core" as Kernel
+participant "Platform Abstraction" as Platform
+participant "Memory Protection Service" as MPU
+participant "Health Monitor" as Health
+participant "Priority Scheduler" as Scheduler
+participant "Diagnostic Manager" as Diagnostics
+Kernel -> Platform : initialize clocks and timer
+Kernel -> Platform : run startup self check
+Platform --> Kernel : self check result
+Kernel -> MPU : configure task regions
+MPU --> Kernel : region table ready
+Kernel -> Health : report startup checkpoints
+Health --> Kernel : startup accepted
+Kernel -> Scheduler : admit safety tasks
+Scheduler --> Kernel : ready queue initialized
+Kernel -> Diagnostics : record boot complete
+@enduml

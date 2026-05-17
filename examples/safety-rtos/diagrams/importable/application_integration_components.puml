@@ -1,0 +1,49 @@
+@startuml
+title SafetyLite application integration component view
+
+component "Safety Application API" as AppAPI <<ARC-AppAPI>>
+component "Task Supervisor" as TaskSupervisor <<ARC-TaskSupervisor>>
+component "Priority Scheduler" as Scheduler <<ARC-Scheduler>>
+component "IPC Manager" as IPC <<ARC-IPC>>
+component "Time Service" as TimeService <<ARC-TimeService>>
+component "Health Monitor" as Health <<ARC-HealthMonitor>>
+component "Kernel Core" as Kernel <<ARC-Kernel>>
+component "Brake Control Task" as BrakeTask <<APP-SafetyCritical>>
+component "Steering Assist Task" as SteeringTask <<APP-SafetyCritical>>
+component "Telemetry Task" as TelemetryTask <<APP-NonCritical>>
+component "Diagnostic Request Task" as DiagnosticTask <<APP-Service>>
+
+interface ActivateTask as IActivate
+interface Checkpoint as ICheckpoint
+interface QueueAPI as IQueue
+interface EventFlagAPI as IEvent
+interface TimeQuery as ITime
+interface ServiceStatus as IStatus
+
+BrakeTask --> IActivate : request activation
+BrakeTask --> ICheckpoint : safety checkpoint
+BrakeTask --> IQueue : actuator command queue
+SteeringTask --> IActivate : request activation
+SteeringTask --> ICheckpoint : safety checkpoint
+TelemetryTask --> IQueue : publish status
+TelemetryTask --> ITime : timestamp
+DiagnosticTask --> IEvent : wait diagnostic event
+DiagnosticTask --> IStatus : service result
+
+IActivate --> AppAPI : validated service
+ICheckpoint --> AppAPI : validated service
+IQueue --> AppAPI : validated service
+IEvent --> AppAPI : validated service
+ITime --> AppAPI : validated service
+IStatus --> AppAPI : status reporting
+
+AppAPI --> Kernel : caller identity
+AppAPI --> Scheduler : activation request
+AppAPI --> IPC : queue/event operation
+AppAPI --> TimeService : time query
+AppAPI --> Health : checkpoint report
+TaskSupervisor --> Health : missing checkpoint
+Scheduler --> TaskSupervisor : dispatched task
+
+note right of AppAPI: REQ-008 API-001 API-002 API-003 API-004 SAF-007
+@enduml

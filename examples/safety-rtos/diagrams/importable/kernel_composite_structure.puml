@@ -1,0 +1,17 @@
+@startuml
+class "Kernel Core" as KernelCore <<structuredClassifier>> {
+  port timerTick
+  port dispatchRequest
+  part scheduler : PriorityScheduler
+  part taskTable : TaskTable
+  part criticalSection : InterruptGuard
+}
+class "Priority Scheduler" as Scheduler
+class "Task Table" as TaskTable
+class "Interrupt Guard" as InterruptGuard
+class "Memory Protection Service" as MPU
+KernelCore *-- Scheduler : scheduler
+KernelCore *-- TaskTable : taskTable
+KernelCore *-- InterruptGuard : criticalSection
+KernelCore --> MPU : switchesRegion
+@enduml

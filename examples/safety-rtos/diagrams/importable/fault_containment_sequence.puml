@@ -1,0 +1,16 @@
+@startuml
+participant "Memory Protection Service" as MPU
+participant "Kernel Core" as Kernel
+participant "Health Monitor" as Health
+participant "Diagnostic Manager" as Diagnostics
+participant "Watchdog Manager" as Watchdog
+participant "Platform Abstraction" as Platform
+MPU -> Kernel : access violation trap
+Kernel -> Health : raise safety fault
+Health -> Diagnostics : persist fault record
+Diagnostics --> Health : record accepted
+Health -> Kernel : enter safe state
+Kernel -> Platform : disable affected outputs
+Health -> Watchdog : block watchdog refresh
+Watchdog --> Platform : reset allowed
+@enduml

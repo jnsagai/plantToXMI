@@ -1,0 +1,15 @@
+@startuml
+package "SafetyLite RTOS" as RTOS {
+  package "Kernel Services" as KernelPkg
+  package "Safety Services" as SafetyPkg
+  package "Platform Services" as PlatformPkg
+  package "Application API" as ApiPkg
+}
+package "Safety Application" as AppPkg
+package "ECU Hardware" as HardwarePkg
+ApiPkg ..> KernelPkg : schedules
+KernelPkg ..> SafetyPkg : reports faults
+SafetyPkg ..> PlatformPkg : stores diagnostics
+PlatformPkg ..> HardwarePkg : controls peripherals
+AppPkg ..> ApiPkg : uses
+@enduml

@@ -1,0 +1,7 @@
+*.qea
+*.qeax
+*.eap
+*.eapx
+*.ldb
+*.laccdb
+!*.placeholder

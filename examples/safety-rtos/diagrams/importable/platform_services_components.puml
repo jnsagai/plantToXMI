@@ -1,0 +1,52 @@
+@startuml
+title SafetyLite platform services component view
+
+component "Platform Abstraction" as Platform <<ARC-Platform>>
+component "Timer Driver" as Timer <<DRV-Timer>>
+component "Interrupt Controller Adapter" as Interrupts <<DRV-Interrupts>>
+component "MPU Driver" as MpuDriver <<DRV-MPU>>
+component "Watchdog Driver" as WatchdogDriver <<DRV-Watchdog>>
+component "Reset Controller" as ResetDriver <<DRV-Reset>>
+component "Nonvolatile Storage Driver" as NvDriver <<DRV-NVM>>
+component "Diagnostic Transport" as DiagTransport <<DRV-Diagnostics>>
+component "Kernel Core" as Kernel <<ARC-Kernel>>
+component "Priority Scheduler" as Scheduler <<ARC-Scheduler>>
+component "Memory Protection Service" as MPU <<ARC-MemoryProtection>>
+component "Watchdog Manager" as Watchdog <<ARC-WatchdogManager>>
+component "Diagnostic Manager" as Diagnostics <<ARC-DiagnosticManager>>
+component "Reset Manager" as Reset <<ARC-ResetManager>>
+
+interface TimerAPI as ITimer
+interface InterruptAPI as IInterrupt
+interface MpuAPI as IMpu
+interface WatchdogAPI as IWatchdog
+interface ResetAPI as IReset
+interface StorageAPI as IStorage
+interface DiagnosticAPI as IDiagnostics
+
+Platform --> Timer : tick hardware
+Platform --> Interrupts : critical sections
+Platform --> MpuDriver : region programming
+Platform --> WatchdogDriver : watchdog refresh
+Platform --> ResetDriver : software reset
+Platform --> NvDriver : bounded write
+Platform --> DiagTransport : diagnostic event
+
+Scheduler --> ITimer : tick source
+Kernel --> IInterrupt : enter critical section
+MPU --> IMpu : program regions
+Watchdog --> IWatchdog : refresh or withhold
+Reset --> IReset : request reset
+Diagnostics --> IStorage : fault snapshot
+Diagnostics --> IDiagnostics : event notification
+
+ITimer --> Platform : timer facade
+IInterrupt --> Platform : interrupt facade
+IMpu --> Platform : MPU facade
+IWatchdog --> Platform : watchdog facade
+IReset --> Platform : reset facade
+IStorage --> Platform : storage facade
+IDiagnostics --> Platform : diagnostic facade
+
+note right of Platform: REQ-006 PLT-001 PLT-002 PLT-003 PLT-004 PLT-005 PLT-006
+@enduml

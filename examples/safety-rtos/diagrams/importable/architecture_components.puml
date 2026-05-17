@@ -1,0 +1,75 @@
+@startuml
+title SafetyLite RTOS complete component architecture
+
+component "Kernel Core" as Kernel <<ARC-Kernel>>
+component "Startup Controller" as Startup <<ARC-StartupController>>
+component "Configuration Manager" as Config <<ARC-ConfigManager>>
+component "Mode Manager" as Mode <<ARC-ModeManager>>
+component "Priority Scheduler" as Scheduler <<ARC-Scheduler>>
+component "Time Service" as Time <<ARC-TimeService>>
+component "IPC Manager" as IPC <<ARC-IPC>>
+component "Memory Protection Service" as MPU <<ARC-MemoryProtection>>
+component "Health Monitor" as Health <<ARC-HealthMonitor>>
+component "Watchdog Manager" as Watchdog <<ARC-WatchdogManager>>
+component "Diagnostic Manager" as Diagnostics <<ARC-DiagnosticManager>>
+component "Reset Manager" as Reset <<ARC-ResetManager>>
+component "Platform Abstraction" as Platform <<ARC-Platform>>
+component "Safety Application API" as AppAPI <<ARC-AppAPI>>
+component "Safety Task Supervisor" as TaskSupervisor <<ARC-TaskSupervisor>>
+component "Fault Snapshot Store" as FaultStore <<ARC-FaultStore>>
+
+interface KernelServices as IKernel
+interface SchedulerAPI as IScheduler
+interface ApplicationServices as IApp
+interface SafetyHooks as ISafety
+interface FaultReporter as IFault
+interface HealthSummary as IHealth
+interface PlatformAPI as IPlatform
+interface StorageAPI as IStorage
+interface ResetControl as IReset
+
+AppAPI --> IApp : exposes
+IApp --> Kernel : service calls
+IApp --> Scheduler : activation
+IApp --> IPC : queues/events
+IApp --> Time : time query
+IApp --> Health : checkpoint
+
+Startup --> Config : validates tables
+Startup --> Platform : initializes drivers
+Startup --> MPU : loads regions
+Startup --> Health : startup checkpoints
+Startup --> Mode : enter normal mode
+Kernel --> Startup : boot sequence
+Kernel --> Mode : mode transition
+Kernel --> Scheduler : dispatch request
+Kernel --> IKernel : internal services
+
+Scheduler --> Time : tick source
+Scheduler --> MPU : switch region
+Scheduler --> IPC : wake blocked tasks
+Scheduler --> Health : deadline miss
+Scheduler --> TaskSupervisor : budget accounting
+TaskSupervisor --> Health : task health
+MPU --> Health : access violation
+
+Health --> Watchdog : health summary
+Health --> Diagnostics : classified fault
+Health --> Mode : degraded or safe state
+Watchdog --> Reset : reset request
+Diagnostics --> FaultStore : bounded snapshot
+Diagnostics --> Platform : diagnostic event
+Reset --> Platform : software reset
+FaultStore --> StorageAPI : persist record
+
+Platform --> IPlatform : driver facade
+StorageAPI --> Platform : nonvolatile write
+IReset --> Reset : controlled reset
+IHealth --> Health : status query
+IFault --> Health : fault event
+ISafety --> Health : checkpoint
+IScheduler --> Scheduler : schedule request
+
+note right of Health: SAF-001 SAF-002 SAF-008 SAF-009
+note right of Diagnostics: SAF-004 SAF-010 REQ-013
+@enduml

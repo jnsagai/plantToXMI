@@ -1,0 +1,11 @@
+@startuml
+title Startup Interaction Overview
+start
+:ref Startup Sequence;
+if (startup self-checks passed?) then (yes)
+  :ref Periodic Scheduling Sequence;
+else (no)
+  :ref Fault Containment Sequence;
+endif
+stop
+@enduml

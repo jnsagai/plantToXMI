@@ -1,0 +1,144 @@
+﻿@startuml
+title SafetyLite RTOS requirement traceability
+
+class "Safe-state transition on repeated deadline miss" as SAF001 <<requirement>> {
+  id: SAF-001
+  text: The RTOS shall transition to a controlled safe state when a safety-critical task repeatedly misses its deadline.
+}
+
+class "Watchdog refresh gated by checkpoints" as SAF002 <<requirement>> {
+  id: SAF-002
+  text: The health monitor shall refresh the external watchdog only after all configured safety checkpoints are observed.
+}
+
+class "MPU write isolation" as SAF003 <<requirement>> {
+  id: SAF-003
+  text: The memory protection service shall deny writes outside a task's configured memory region.
+}
+
+class "Persist reset reason and safety fault" as SAF004 <<requirement>> {
+  id: SAF-004
+  text: The diagnostic manager shall persist reset reason and last safety fault before requesting ECU reset.
+}
+
+class "Deterministic equal-priority ordering" as SAF005 <<requirement>> {
+  id: SAF-005
+  text: The scheduler shall preserve deterministic execution order for tasks with equal priority by configured activation order.
+}
+
+class "Startup self-check gate" as SAF006 <<requirement>> {
+  id: SAF-006
+  text: The startup controller shall prevent normal mode entry when mandatory self-checks fail.
+}
+
+class "Mode-aware service call rejection" as SAF007 <<requirement>> {
+  id: SAF-007
+  text: The kernel shall reject service calls from a task whose current mode does not permit the requested service.
+}
+
+class "Fault severity classification" as SAF008 <<requirement>> {
+  id: SAF-008
+  text: The health monitor shall classify faults as recoverable, degraded, or fatal before requesting a system mode change.
+}
+
+class "Stale health blocks watchdog refresh" as SAF009 <<requirement>> {
+  id: SAF-009
+  text: The watchdog manager shall withhold refresh when the health summary is stale.
+}
+
+class "Bounded reset-pending fault snapshot" as SAF010 <<requirement>> {
+  id: SAF-010
+  text: The RTOS shall record a bounded fault snapshot before entering reset pending mode.
+}
+
+class "Scheduler tick budget" as REQ010 <<requirement>> {
+  id: REQ-010
+  text: Scheduler tick processing shall complete within 50 microseconds on the reference ECU.
+}
+
+class "Non-blocking scheduler fault notification" as REQ013 <<requirement>> {
+  id: REQ-013
+  text: Fault notification to the diagnostic manager shall be non-blocking for the scheduler.
+}
+
+class "ARC-Kernel" as Kernel
+class "ARC-Scheduler" as Scheduler
+class "ARC-StartupController" as StartupController
+class "ARC-ConfigManager" as ConfigManager
+class "ARC-ModeManager" as ModeManager
+class "ARC-HealthMonitor" as HealthMonitor
+class "ARC-WatchdogManager" as WatchdogManager
+class "ARC-MemoryProtection" as MemoryProtection
+class "ARC-DiagnosticManager" as DiagnosticManager
+class "ARC-ResetManager" as ResetManager
+class "ARC-AppAPI" as AppAPI
+class "ARC-Platform" as Platform
+class "DD-Startup" as StartupFlow
+class "DD-FaultContainment" as FaultContainment
+class "DD-WatchdogRecovery" as WatchdogRecovery
+class "DD-PeriodicScheduling" as PeriodicScheduling
+class "VAL-001" as Val001
+class "VAL-002" as Val002
+class "VAL-003" as Val003
+class "VAL-004" as Val004
+class "VAL-005" as Val005
+
+SAF001 ..> HealthMonitor : <<satisfy>>
+SAF001 ..> Scheduler : <<satisfy>>
+SAF001 ..> Kernel : <<satisfy>>
+SAF001 ..> FaultContainment : <<refine>>
+Val004 ..> SAF001 : <<verify>>
+
+SAF002 ..> HealthMonitor : <<satisfy>>
+SAF002 ..> WatchdogManager : <<satisfy>>
+SAF002 ..> WatchdogRecovery : <<refine>>
+Val003 ..> SAF002 : <<verify>>
+
+SAF003 ..> MemoryProtection : <<satisfy>>
+SAF003 ..> Platform : <<satisfy>>
+SAF003 ..> StartupFlow : <<refine>>
+Val005 ..> SAF003 : <<verify>>
+
+SAF004 ..> DiagnosticManager : <<satisfy>>
+SAF004 ..> Platform : <<satisfy>>
+SAF004 ..> FaultContainment : <<refine>>
+Val004 ..> SAF004 : <<verify>>
+
+SAF005 ..> Scheduler : <<satisfy>>
+SAF005 ..> PeriodicScheduling : <<refine>>
+SAF005 ..> REQ010 : <<trace>>
+Val002 ..> SAF005 : <<verify>>
+
+SAF006 ..> StartupController : <<satisfy>>
+SAF006 ..> ConfigManager : <<satisfy>>
+SAF006 ..> StartupFlow : <<refine>>
+Val001 ..> SAF006 : <<verify>>
+
+SAF007 ..> AppAPI : <<satisfy>>
+SAF007 ..> Kernel : <<satisfy>>
+SAF007 ..> PeriodicScheduling : <<refine>>
+Val002 ..> SAF007 : <<verify>>
+
+SAF008 ..> HealthMonitor : <<satisfy>>
+SAF008 ..> ModeManager : <<satisfy>>
+SAF008 ..> FaultContainment : <<refine>>
+Val004 ..> SAF008 : <<verify>>
+
+SAF009 ..> WatchdogManager : <<satisfy>>
+SAF009 ..> HealthMonitor : <<satisfy>>
+SAF009 ..> WatchdogRecovery : <<refine>>
+Val003 ..> SAF009 : <<verify>>
+
+SAF010 ..> DiagnosticManager : <<satisfy>>
+SAF010 ..> ResetManager : <<satisfy>>
+SAF010 ..> REQ013 : <<trace>>
+SAF010 ..> FaultContainment : <<refine>>
+Val004 ..> SAF010 : <<verify>>
+
+SAF001 *-- SAF002
+SAF001 *-- SAF004
+SAF001 *-- SAF008
+SAF001 *-- SAF010
+SAF006 *-- SAF003
+SAF009 *-- SAF002
+@enduml

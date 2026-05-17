@@ -1,0 +1,13 @@
+@startuml
+start
+:Receive timer tick;
+:Update task budgets;
+if (deadline missed?) then (yes)
+  :Report fault to health monitor;
+else (no)
+  :Select highest priority ready task;
+endif
+:Switch MPU region;
+:Dispatch task;
+stop
+@enduml

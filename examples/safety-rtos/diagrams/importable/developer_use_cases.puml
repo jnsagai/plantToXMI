@@ -1,0 +1,9 @@
+@startuml
+actor "Safety Developer" as Dev
+usecase "Configure task table" as UC1
+usecase "Review timing fault" as UC2
+usecase "Inspect watchdog reset" as UC3
+Dev --> UC1
+Dev --> UC2
+Dev --> UC3
+@enduml

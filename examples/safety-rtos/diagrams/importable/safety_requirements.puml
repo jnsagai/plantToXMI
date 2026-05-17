@@ -1,0 +1,74 @@
+@startuml
+title SafetyLite RTOS safety requirement decomposition
+
+class "SafetyLite RTOS safety goals" as SAF <<requirement>> {
+  id: SAF
+  text: The RTOS shall preserve controllability, containment, and diagnosability for safety-related tasks.
+}
+
+class "Safe-state transition on repeated deadline miss" as SAF001 <<requirement>> {
+  id: SAF-001
+  text: The RTOS shall transition to a controlled safe state when a safety-critical task repeatedly misses its deadline.
+}
+
+class "Watchdog refresh gated by checkpoints" as SAF002 <<requirement>> {
+  id: SAF-002
+  text: The health monitor shall refresh the external watchdog only after all configured safety checkpoints are observed.
+}
+
+class "MPU write isolation" as SAF003 <<requirement>> {
+  id: SAF-003
+  text: The memory protection service shall deny writes outside a task's configured memory region.
+}
+
+class "Persist reset reason and safety fault" as SAF004 <<requirement>> {
+  id: SAF-004
+  text: The diagnostic manager shall persist reset reason and last safety fault before requesting ECU reset.
+}
+
+class "Deterministic equal-priority ordering" as SAF005 <<requirement>> {
+  id: SAF-005
+  text: The scheduler shall preserve deterministic execution order for tasks with equal priority by configured activation order.
+}
+
+class "Startup self-check gate" as SAF006 <<requirement>> {
+  id: SAF-006
+  text: The startup controller shall prevent normal mode entry when mandatory self-checks fail.
+}
+
+class "Mode-aware service call rejection" as SAF007 <<requirement>> {
+  id: SAF-007
+  text: The kernel shall reject service calls from a task whose current mode does not permit the requested service.
+}
+
+class "Fault severity classification" as SAF008 <<requirement>> {
+  id: SAF-008
+  text: The health monitor shall classify faults as recoverable, degraded, or fatal before requesting a system mode change.
+}
+
+class "Stale health blocks watchdog refresh" as SAF009 <<requirement>> {
+  id: SAF-009
+  text: The watchdog manager shall withhold refresh when the health summary is stale.
+}
+
+class "Bounded reset-pending fault snapshot" as SAF010 <<requirement>> {
+  id: SAF-010
+  text: The RTOS shall record a bounded fault snapshot before entering reset pending mode.
+}
+
+SAF *-- SAF001
+SAF *-- SAF002
+SAF *-- SAF003
+SAF *-- SAF004
+SAF *-- SAF005
+SAF *-- SAF006
+SAF *-- SAF007
+SAF *-- SAF008
+SAF *-- SAF009
+SAF *-- SAF010
+
+SAF001 *-- SAF008
+SAF001 *-- SAF010
+SAF002 *-- SAF009
+SAF006 *-- SAF003
+@enduml
